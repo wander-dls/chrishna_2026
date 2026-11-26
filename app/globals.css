@@ -1,26 +1,215 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================================
+   CHRISHNA DESIGN SYSTEM
+========================================= */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Chrishna Brand Palette */
+  --chrishna-background: #F7F3ED;
+  --chrishna-surface: #FFFFFF;
+  --chrishna-primary: #392C24;
+  --chrishna-primary-hover: #806653;
+  --chrishna-accent: #C2A589;
+  --chrishna-accent-hover: #B59A7D;
+  --chrishna-foreground: #392C24;
+  --chrishna-muted: #806653;
+  --chrishna-border: #E6D7C5;
+  --chrishna-ring: #C2A589;
+
+  /* shadcn Semantic Colors */
+  --background: var(--chrishna-background);
+  --foreground: var(--chrishna-foreground);
+
+  --card: var(--chrishna-surface);
+  --card-foreground: var(--chrishna-foreground);
+
+  --popover: var(--chrishna-surface);
+  --popover-foreground: var(--chrishna-foreground);
+
+  --primary: var(--chrishna-primary);
+  --primary-foreground: #FFFFFF;
+
+  --secondary: var(--chrishna-background);
+  --secondary-foreground: var(--chrishna-foreground);
+
+  --muted: var(--chrishna-background);
+  --muted-foreground: var(--chrishna-muted);
+
+  --accent: var(--chrishna-accent);
+  --accent-foreground: var(--chrishna-foreground);
+
+  --destructive: #B42318;
+  --border: var(--chrishna-border);
+  --input: var(--chrishna-border);
+  --ring: var(--chrishna-ring);
+
+  /* Charts */
+  --chart-1: #392C24;
+  --chart-2: #806653;
+  --chart-3: #C2A589;
+  --chart-4: #E6D7C5;
+  --chart-5: #B59A83;
+
+  /* Radius */
+  --radius: 0.625rem;
+
+  /* Sidebar */
+  --sidebar: var(--chrishna-surface);
+  --sidebar-foreground: var(--chrishna-foreground);
+  --sidebar-primary: var(--chrishna-primary);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: var(--chrishna-background);
+  --sidebar-accent-foreground: var(--chrishna-foreground);
+  --sidebar-border: var(--chrishna-border);
+  --sidebar-ring: var(--chrishna-ring);
+}
+
+.dark {
+  /* Chrishna Dark Palette */
+  --chrishna-background: #211C19;
+  --chrishna-surface: #302622;
+  --chrishna-primary: #E6D7C5;
+  --chrishna-primary-hover: #F7F3ED;
+  --chrishna-accent: #C2A589;
+  --chrishna-accent-hover: #D6B99E;
+  --chrishna-foreground: #F7F3ED;
+  --chrishna-muted: #B8A99A;
+  --chrishna-border: #493A32;
+  --chrishna-ring: #C2A589;
+
+  /* shadcn Semantic Colors */
+  --background: var(--chrishna-background);
+  --foreground: var(--chrishna-foreground);
+
+  --card: var(--chrishna-surface);
+  --card-foreground: var(--chrishna-foreground);
+
+  --popover: var(--chrishna-surface);
+  --popover-foreground: var(--chrishna-foreground);
+
+  --primary: var(--chrishna-primary);
+  --primary-foreground: #211C19;
+
+  --secondary: #493A32;
+  --secondary-foreground: var(--chrishna-foreground);
+
+  --muted: #493A32;
+  --muted-foreground: var(--chrishna-muted);
+
+  --accent: var(--chrishna-accent);
+  --accent-foreground: #211C19;
+
+  --destructive: #F87171;
+  --border: var(--chrishna-border);
+  --input: var(--chrishna-border);
+  --ring: var(--chrishna-ring);
+
+  /* Charts */
+  --chart-1: #E6D7C5;
+  --chart-2: #C2A589;
+  --chart-3: #B59A83;
+  --chart-4: #806653;
+  --chart-5: #493A32;
+
+  /* Sidebar */
+  --sidebar: var(--chrishna-surface);
+  --sidebar-foreground: var(--chrishna-foreground);
+  --sidebar-primary: var(--chrishna-primary);
+  --sidebar-primary-foreground: #211C19;
+  --sidebar-accent: #493A32;
+  --sidebar-accent-foreground: var(--chrishna-foreground);
+  --sidebar-border: var(--chrishna-border);
+  --sidebar-ring: var(--chrishna-ring);
 }
 
 @theme inline {
+  /* Semantic Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chrishna Brand Colors */
+  --color-chrishna-background: var(--chrishna-background);
+  --color-chrishna-surface: var(--chrishna-surface);
+  --color-chrishna-foreground: var(--chrishna-foreground);
+  --color-chrishna-primary: var(--chrishna-primary);
+  --color-chrishna-primary-hover: var(--chrishna-primary-hover);
+  --color-chrishna-accent: var(--chrishna-accent);
+  --color-chrishna-accent-hover: var(--chrishna-accent-hover);
+  --color-chrishna-muted: var(--chrishna-muted);
+  --color-chrishna-border: var(--chrishna-border);
+  --color-chrishna-ring: var(--chrishna-ring);
+
+  /* Chart Colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar Colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: Georgia, "Times New Roman", serif;
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+  }
 }

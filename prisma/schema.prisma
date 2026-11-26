@@ -6,3 +6,250 @@ generator client {
 datasource db {
     provider = "postgresql"
 }
+
+enum UserRole {
+    ADMIN
+    CLIENT
+}
+
+enum GalleryStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+enum ClientGalleryStatus {
+    PROCESSING
+    READY
+    ARCHIVED
+}
+
+enum InquiryStatus {
+    NEW
+    CONTACTED
+    IN_PROGRESS
+    COMPLETED
+    ARCHIVED
+}
+
+enum PhotoPurchaseStatus {
+    PENDING
+    PAID
+    FAILED
+    REFUNDED
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String    @unique
+    emailVerified DateTime?
+    image         String?
+    role          UserRole  @default(CLIENT)
+    passwordHash  String?
+
+    accounts      Account[]
+    session       Session[]
+    clientGallery ClientGallery[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Account {
+    id            String  @id @default(cuid())
+    userId        String
+    type          String
+    provider      String
+    providerAccId String
+    refresh_token String? @db.Text
+    access_token  String? @db.Text
+    expires_at    Int?
+    token_type    String?
+    scope         String?
+    id_token      String? @db.Text
+    session_state String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Gallery {
+    id          String        @id @default(cuid())
+    title       String
+    slug        String        @db.Text
+    description String        @db.Text
+    category    String?
+    status      GalleryStatus @default(DRAFT)
+    coverImgUrl String?
+    isFeatured  Boolean       @default(false)
+    sortOrder   Int           @default(0)
+    publishedAt DateTime?
+
+    photos Photo[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Photo {
+    id            String  @id @default(cuid())
+    galleryId     String
+    cloudPublicId String  @unique //Cloudinary public Id
+    imageUrl      String?
+    caption       String?
+    altText       String?
+    sortOrder     Int     @default(0)
+
+    gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([galleryId, sortOrder])
+}
+
+model ClientGallery {
+    id                   String              @id @default(cuid())
+    clientId             String
+    title                String
+    description          String?
+    status               ClientGalleryStatus @default(PROCESSING)
+    selectionSubmittedAt DateTime?
+
+    client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+    photos ClientPhoto[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    packageId          String?
+    includedPhotoCount Int     @default(10)
+    addPhotoPrice      Decimal @default(0.00) @db.Decimal(10, 2)
+
+    package PhotoPackage? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+    purchases PhotoPurchase[]
+    download  PhotoDownload[]
+
+    @@index([clientId])
+}
+
+model ClientPhoto {
+    id               String  @id @default(cuid())
+    clientGalleryId  String
+    originalPublicId String
+    previewPublicId  String
+    originalFormat   String?
+    originalWidth    Int?
+    originalHeight   Int?
+    caption          String?
+    altText          String?
+    sortOrder        Int     @default(0)
+
+    gallery   ClientGallery   @relation(fields: [clientGalleryId], references: [id], onDelete: Cascade)
+    selection PhotoSelection? @relation("PhotoToSelection")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    download PhotoDownload[]
+
+    @@index([clientGalleryId, sortOrder])
+}
+
+model PhotoSelection {
+    id      String        @id @default(cuid())
+    photoId String        @unique
+    name    String
+    email   String
+    phone   String?
+    subject String?
+    message String        @db.Text
+    status  InquiryStatus @default(NEW)
+
+    photo ClientPhoto @relation("PhotoToSelection", fields: [photoId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([status, createdAt])
+}
+
+model PhotoPackage {
+    id        String  @id @default(cuid())
+    name      String
+    inclPhoto Int
+    price     Decimal @db.Decimal(10, 2)
+    currency  String  @default("USD")
+    isActive  Boolean @default(true)
+    sortOrder Int     @default(0)
+
+    clientGallery ClientGallery[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model PhotoPurchase {
+    id              String              @id @default(cuid())
+    clientGalleryId String
+    quantity        Int
+    unitPrice       Decimal             @db.Decimal(10, 2)
+    totalAmount     Decimal             @db.Decimal(10, 2)
+    currency        String              @default("USD")
+    status          PhotoPurchaseStatus @default(PENDING)
+
+    stripCheckouId String? @unique // Stripe Checkout Session Id
+    stripePmntInt  String? @unique // Stripe Payment Intent
+
+    gallery ClientGallery @relation(fields: [clientGalleryId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([clientGalleryId, status])
+}
+
+model PhotoDownload {
+    id                String   @id @default(cuid())
+    clientGalleryId   String
+    photoId           String
+    downloadCount     Int      @default(1)
+    firstDownloadedAt DateTime @default(now())
+    lastDownloadedAt  DateTime @default(now())
+
+    gallery ClientGallery @relation(fields: [clientGalleryId], references: [id], onDelete: Cascade)
+    photo   ClientPhoto   @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+    @@unique([clientGalleryId, photoId])
+    @@index([clientGalleryId])
+}
+
+model WebsiteSettings {
+    id    String @id @default(cuid())
+    key   String @unique
+    value Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
